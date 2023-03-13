@@ -9,6 +9,7 @@ import { PORT, prisma } from "./config"
 import { passportInitializer, toobusy } from "./middleware"
 import { errorHandler } from "./lib"
 import userRoutes from "./routes/user.routes"
+import { socketInitializer } from "./socket"
 
 const app = express()
 
@@ -27,6 +28,8 @@ app.use("/api/v1/users", userRoutes)
 errorHandler(app)
 
 const server = http.createServer(app)
+
+socketInitializer(server)
 
 server.listen(PORT, async () => {
     try {

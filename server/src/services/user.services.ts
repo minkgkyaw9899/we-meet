@@ -2,6 +2,7 @@ import createHttpError from "http-errors"
 import { Prisma } from "@prisma/client"
 
 import { prisma } from "../config"
+
 import { CreateUser } from "../interface/user.interface"
 
 export const findAllUsers = async () => {
