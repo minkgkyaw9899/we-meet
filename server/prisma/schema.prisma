@@ -1,0 +1,77 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id               Int       @id @default(autoincrement())
+  name             String
+  email            String    @unique
+  password         String?
+  otp              String?
+  expiresTime      DateTime?
+  loginType        USER_TYPE @default(LOCAL)
+  firends          Friends[]
+  messagesSent     Message[] @relation("Sender")
+  messagesReceived Message[] @relation("Recipient")
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+}
+
+model Friends {
+  id        Int            @id @default(autoincrement())
+  user      User           @relation(fields: [userId], references: [id])
+  userId    Int            @unique
+  status    FRIENDS_STATUS
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+}
+
+model Message {
+  id    Int     @id @default(autoincrement())
+  text  String?
+  image String?
+  voice String?
+
+  reply   Message[] @relation("Reply")
+  replyTo Message?  @relation("Reply", fields: [replyId], references: [id])
+  replyId Int       @unique
+
+  sender   User @relation("Sender", fields: [senderId], references: [id])
+  senderId Int
+
+  recipient   User @relation("Recipient", fields: [recipientId], references: [id])
+  recipientId Int
+
+  reaction MESSAGE_REACTION
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum MESSAGE_REACTION {
+  LIKE  @map("Like")
+  LOVE  @map("Love")
+  HAHA  @map("Haha")
+  WOW   @map("Wow")
+  SAD   @map("Sad")
+  ANGRY @map("Angry")
+}
+
+enum FRIENDS_STATUS {
+  REQUESTING @map("Requesting")
+  PENDING    @map("Pending")
+  APPROVED   @map("Approved")
+}
+
+enum USER_TYPE {
+  LOCAL  @map("Local")
+  GOOGLE @map("Google")
+}
